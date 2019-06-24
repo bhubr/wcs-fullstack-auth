@@ -1,6 +1,7 @@
 const express = require('express');
 const bcrypt = require('bcrypt');
 const passport = require('passport');
+const jwt = require('jsonwebtoken');
 const db = require('../db');
 
 const saltRounds = 10;
@@ -41,10 +42,17 @@ router.post('/signup', (req, res) => {
 router.post('/signin',
   passport.authenticate('local', { session:  false }),
   (req, res) => {
-    // Idéalement c'est ici qu'on génèrerait le JWT,
-    // plutôt que de renvoyer l'user !!
-    return res.json({
-      user: req.user
+    jwt.sign(req.user, process.env.SECRET_KEY, (err, token) => {
+      if (err) {
+        return res.status(500).json({
+          error: err.message
+        });
+      }
+      // Idéalement c'est ici qu'on génèrerait le JWT,
+      // plutôt que de renvoyer l'user !!
+      return res.json({
+        token
+      });
     });
   }
 );

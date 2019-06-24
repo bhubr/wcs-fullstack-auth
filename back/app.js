@@ -3,11 +3,15 @@ const bodyParser = require('body-parser');
 const bcrypt = require('bcrypt');
 const passport = require('passport');
 const LocalStrategy = require('passport-local');
+const JwtStrategy = require('passport-jwt').Strategy;
+const ExtractJwt = require('passport-jwt').ExtractJwt;
+
 // Importe dotenv et la configuration stockée dans .env
 // Doit IMPERATIVEMENT être importé avant la mise en place
 // de la connexion à la BDD dans db.js
 require('./env');
 const authRouter = require('./routes/auth');
+const postRouter = require('./routes/post');
 const db = require('./db');
 
 // Initialisation Express et bodyParser
@@ -16,16 +20,6 @@ app.use(bodyParser.json());
 
 // Initialisation Passport
 app.use(passport.initialize());
-
-// Fonctions de "sérialisation" et "dé-sérialisation"
-// Nécessaire UNIQUEMENT pour l'auth par session
-// passport.serializeUser(function(user, done) {
-//   done(null, user);
-// });
-
-// passport.deserializeUser(function(user, done) {
-//   done(null, user);
-// });
 
 // Initialisation de la LocalStrategy
 passport.use(new LocalStrategy(
@@ -70,6 +64,15 @@ passport.use(new LocalStrategy(
   }
 ));
 
+const opts = {
+  jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+  secretOrKey: process.env.SECRET_KEY
+};
+passport.use(new JwtStrategy(opts, function(jwtPayload, done) {
+  done(null, jwtPayload);
+}));
+
 app.use('/api/auth', authRouter);
+app.use('/api/posts', postRouter);
 
 app.listen(process.env.PORT || 5000);
