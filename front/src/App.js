@@ -1,26 +1,34 @@
-import React from 'react';
-import logo from './logo.svg';
+import React, { Component } from 'react';
+import LoginForm from './LoginForm';
+import PostsList from './PostsList';
 import './App.css';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+class App extends Component {
+  constructor(props) {
+    super(props);
+    const token = localStorage.getItem('token') || '';
+    this.state = {
+      token
+    };
+    this.setToken = this.setToken.bind(this);
+  }
+
+  setToken(token) {
+    this.setState({ token });
+  }
+
+  render() {
+    const { token } = this.state;
+    return (
+      <div className="App">
+        {
+          token
+            ? <PostsList token={token} />
+            : <LoginForm setToken={this.setToken} />
+        }
+      </div>
+    );
+  }
 }
 
 export default App;
