@@ -20,6 +20,11 @@ router.post('/signup', (req, res) => {
       error: 'required field(s) missing'
     });
   }
+  if (password.length < 8) {
+    return res.status(400).json({
+      error: 'password is too short'
+    });
+  }
   // Si on a bien un password, on l'encrypte avec bcrypt.hash
   // Le paramètre saltRounds est un nombre d'itérations pour générer
   // un "salt", chaîne aléatoire accolée au password pour empêcher le
@@ -32,6 +37,9 @@ router.post('/signup', (req, res) => {
           'INSERT INTO user SET ?',
           [{ email, password: hash, fullname }],
           (err, status) => {
+            if (err) {
+              return res.sendStatus(500);
+            }
             return res.status(201).json({
               status: 'user created'
             });

@@ -12,6 +12,7 @@ const ExtractJwt = require('passport-jwt').ExtractJwt;
 require('./env');
 const authRouter = require('./routes/auth');
 const postRouter = require('./routes/post');
+const userRouter = require('./routes/user');
 const db = require('./db');
 
 // Initialisation Express et bodyParser
@@ -74,5 +75,10 @@ passport.use(new JwtStrategy(opts, function(jwtPayload, done) {
 
 app.use('/api/auth', authRouter);
 app.use('/api/posts', postRouter);
+app.use('/api/users', userRouter);
+
+app.get('/', (req, res) => res.set('content-type', 'text/plain').send('Hello world'));
 
 app.listen(process.env.PORT || 5000);
+
+module.exports = app;
